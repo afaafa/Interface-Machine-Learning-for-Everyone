@@ -57,93 +57,72 @@ st.set_page_config(
 # # Show image
 # st.sidebar.image(image, use_column_width=True, width=50)
 
-st.sidebar.markdown('**Guideline: [*click here!*](https://www.google.com/search?sca_esv=682fb458cb082d73&rlz=1C1CHBF_enKR1058ID1058&sxsrf=ACQVn0-tyTd2f481K-TV5nlom58dn6NFZg:1708680383706&q=apel&tbm=isch&source=lnms&sa=X&ved=2ahUKEwjMuri6ksGEAxXI1TgGHZwWDKYQ0pQJegQIDBAB&biw=1422&bih=612&dpr=1.35#imgrc=88-1RY50Ek_bsM)**')
-
-st.sidebar.title('Upload your data here')
-uploaded_file = st.sidebar.file_uploader("Choose CSV or Excel file", type=['csv', 'xlsx', 'xls'])
-
-import requests
-
 # URL file di GitHub
 github_url = 'https://raw.githubusercontent.com/pompymandislian/Interface-Machine-Learning-for-Everyone/main/style.css'
 
 # Lakukan HTTP GET request ke URL file di GitHub
 response = requests.get(github_url)
 
-# Periksa apakah permintaan berhasil
+# Check request
 if response.status_code == 200:
-    # Baca konten file
+    # Read file
     css = response.text
-    # Lakukan operasi lain dengan konten CSS
-    print(css)
-else:
-    # Jika permintaan gagal, cetak pesan kesalahan
-    print('Failed to retrieve CSS file:', response.status_code)
     
+    # Result
+    print(css)
+    
+else:
+    print('Failed to retrieve CSS file:', response.status_code)
+
 st.markdown(f'<style>{css}</style>', unsafe_allow_html=True)
 
-# select encoding
-encodings = ['utf-8', 'ISO-8859-1', 'latin1']
+
+st.sidebar.markdown('**Guideline: [*click here!*](https://www.google.com/search?sca_esv=682fb458cb082d73&rlz=1C1CHBF_enKR1058ID1058&sxsrf=ACQVn0-tyTd2f481K-TV5nlom58dn6NFZg:1708680383706&q=apel&tbm=isch&source=lnms&sa=X&ved=2ahUKEwjMuri6ksGEAxXI1TgGHZwWDKYQ0pQJegQIDBAB&biw=1422&bih=612&dpr=1.35#imgrc=88-1RY50Ek_bsM)**')
+st.sidebar.title('Load Data')
+uploaded_file = st.sidebar.file_uploader("Choose CSV or Excel file", type=['csv', 'xlsx', 'xls'])
 
 # If the file has been uploaded
 if uploaded_file is not None:
 
     # Check the type of the uploaded file
     file_ext = uploaded_file.name.split('.')[-1]
-
-    # Initialize delimiter option
-    delimiter_option = st.sidebar.radio("Delimiter Option:", ("With Delimiter", "Without Delimiter", "Open CSV"))
-
+    
     # Read the CSV or Excel file into a DataFrame
     if file_ext == 'csv':
-        for encoding in encodings:
-            try:
-                if delimiter_option == "With Delimiter":
-                   df = pd.read_csv(uploaded_file, encoding=encoding, delimiter=';')
-                   df_copy = df.copy()
+        
+        # Initialize delimiter option
+        delimiter_option = st.sidebar.selectbox("Delimiter Option:", ("Open CSV", "Remove Delimiter"))
+        
+        try:
+            if delimiter_option == "Remove Delimiter":
+                # Initialize delimiter list for 'With Delimiter' option
+                delimiter_list = [',', ';', ' ', '|']  # Add more delimiters as needed
 
-                elif delimiter_option == "Without Delimiter":
-                     df = pd.read_csv(uploaded_file, encoding=encoding)
-                     df_copy = df.copy()
-                
-                elif delimiter_option == 'Open CSV':
-                     df = pd.read_csv(uploaded_file)
-                     df_copy = df.copy()
+                selected_delimiter = st.sidebar.selectbox("Select Delimiter:", delimiter_list)
 
-                if not df.empty:
-                    break  # Break the loop if reading succeeds and dataframe is not empty
+                df = pd.read_csv(uploaded_file, delimiter=selected_delimiter)
+                df_copy = df.copy()
+            
+            elif delimiter_option == 'Open CSV':
+                df = pd.read_csv(uploaded_file)
+                df_copy = df.copy()
 
-                else:
-                    st.warning("Empty CSV file detected.")
-                    st.stop()  # Stop further execution
-
-            except UnicodeDecodeError:
-                st.error(f"Error reading CSV file with encoding {encoding}")
-                continue  # Try the next encoding
-
-            except pd.errors.ParserError as e:
-                # Try reading CSV without specifying delimiter
-                try:
-                    df = pd.read_csv(uploaded_file, encoding=encoding)
-                    df_copy = df.copy()
-                    st.warning("Delimiter not specified. Attempting to read without delimiter.")
-                    if not df.empty:
-                        break
-                    else:
-                        st.warning("Empty CSV file detected.")
-                        st.stop()  # Stop further execution
-
-                except Exception as e:
-                    st.error(f"Error reading CSV file: {e}")
-                    st.stop()  # Stop further execution
-
-            except Exception as e:
-                st.error(f"Error reading CSV file: {e}")
+            # Check if the DataFrame is empty
+            if df.empty:
+                st.warning("Empty CSV file detected.")
                 st.stop()  # Stop further execution
 
+        except Exception as e:
+            st.sidebar.error(f"Error reading CSV file: {e}, Please select remove delimiter")
+            st.stop()  # Stop further execution
+
     elif file_ext in ['xls', 'xlsx']:
-        df = pd.read_excel(uploaded_file)
-        df_copy = df.copy()
+        try:
+            df = pd.read_excel(uploaded_file)
+            df_copy = df.copy()
+        except Exception as e:
+            st.sidebar.error(f"Error reading Excel file: {e}")
+            st.stop()  # Stop further execution
         
     else:
         st.error('Your file must be in Excel or CSV format!')
@@ -157,10 +136,10 @@ if uploaded_file is not None:
 
     st.title('Predict Field')
     st.write("Hello, welcome to this website. You can use it to predict your data. Enjoy using this website." 
-              "Don't forget to read **guidline** that provide from us, thankyou 😊.")
+              "Don't forget to read **Guideline** that provide from us, thankyou 😊.")
 
     # Choose model
-    model_option = st.sidebar.radio("Model Option:", ("Classification", "Regression", "Clustering"))
+    model_option = st.sidebar.selectbox("Machine learning option:", ("Classification", "Regression", "Clustering"))
     
     try:
         global target_column
@@ -299,7 +278,7 @@ if uploaded_file is not None:
                     elif split_option_valid == 'y_valid':
                         st.write(y_valid.head())
             except:
-                st.info('Wait until you are done selecting target data')
+                st.warning('Wait until you are done selecting target data')
 
     # create One Hot Encoding or Label Encoding
     st.subheader("Feature Engineering:")
@@ -368,7 +347,7 @@ if uploaded_file is not None:
                     X_valid = pd.concat([X_valid_encoded, X_valid_ohe], axis=1)
             
         except:
-            st.info('Wait until you are done selecting target data')
+            st.warning('Wait until you are done selecting target data')
 
     elif model_option == 'Clustering':
         
@@ -459,7 +438,7 @@ if uploaded_file is not None:
                     st.write(y_valid.head())
         
         except:
-                st.info('Wait until you are done selecting target data')
+                st.warning('Wait until you are done selecting target data')
 
     elif model_option == 'Clustering':
         
@@ -635,7 +614,7 @@ if uploaded_file is not None:
             return transformed_data, lambda_values
 
     # scaling data
-    select_scaling = st.selectbox("Scaling Option:", ('---', "Standarize-Scaling", 'Robust-Scaling', 
+    select_scaling = st.selectbox("Scaling Option:", ("Standarize-Scaling", 'Robust-Scaling', 
                                                       "MinMax-Scaling", "BoxCox-Transform", 'Log-Transform'))
 
     # initialize scaling data
@@ -709,7 +688,7 @@ if uploaded_file is not None:
                         X_valid, _ = scaling_instance.boxcox_transform(X_valid, lambda_values_train)
         
         except:
-            st.info('Wait until you are done selecting target data')
+            st.warning('Wait until you are done selecting target data')
 
     elif model_option == 'Clustering':
 
@@ -780,7 +759,7 @@ if uploaded_file is not None:
                     st.write(y_valid.head()) 
         
         except:
-            st.info('Wait until you are done selecting target data')
+            st.warning('Wait until you are done selecting target data')
     
     elif model_option == 'Clustering':
         
@@ -1063,7 +1042,7 @@ if uploaded_file is not None:
                 st.write(metric)
         
             except:
-                st.info('Wait until you are done selecting target data')
+                st.warning('Wait until you are done selecting target data')
         
         elif (split_option == "Train-Test" or split_option == 'Train-Test-Validation') and model_option == 'Regression':
             
@@ -1321,7 +1300,7 @@ if uploaded_file is not None:
                 st.write(metrics_regression)
             
             except:
-                st.info('Wait until you are done selecting target data')
+                st.warning('Wait until you are done selecting target data')
     
     def valid_predict():
         """
@@ -2568,7 +2547,7 @@ if uploaded_file is not None:
         if model_option == 'Classification':
             try:
                 # Select model classification
-                select_models = st.selectbox('Select Model', ('---', 'Logistic Regression', 'K-NN', 'Decision Tree', 
+                select_models = st.selectbox('Select Model', ('Logistic Regression', 'K-NN', 'Decision Tree', 
                                                               'SVM', 'XG-Boost', 'Random Forest', 'AdaBoost'),
                                                                key='valid_predict')
 
@@ -2690,14 +2669,14 @@ if uploaded_file is not None:
                         best_params = model.logit()
             
             except:
-                st.info('Wait until you are done selecting target data')
+                st.warning('Wait until you are done selecting target data')
         
         elif model_option == 'Regression':
             
             try:
 
                 # Select model regression
-                select_models_regriss = st.selectbox('Select Model', ('---', 'Linear Regression','K-NN', 'Decision Tree', 
+                select_models_regriss = st.selectbox('Select Model', ('Linear Regression','K-NN', 'Decision Tree', 
                                                                       'SVM','XG-Boost', 'Random Forest', 'AdaBoost',
                                                                       'Ridge', 'Lasso'),
                                                                        key = 'valid_predict_regressor')
@@ -2851,7 +2830,7 @@ if uploaded_file is not None:
                         best_params_regriss = model.ridge_regressor()
             
             except:
-                st.info('Wait until you are done selecting target data')
+                st.warning('Wait until you are done selecting target data')
         
     def testing():
         """Function for evaluation of the test model"""
@@ -3068,7 +3047,7 @@ if uploaded_file is not None:
                     test_metrics['ROC-AUC'].append(ada_roc_auc)
             
             except:
-                st.info('Wait until you are done selecting target data')
+                st.warning('Wait until you are done selecting target data')
 
         elif (split_option == 'Train-Test' and model_option == 'Regression') or\
              (split_option == 'Train-Test-Validation' and  model_option == 'Regression'):
@@ -3298,7 +3277,7 @@ if uploaded_file is not None:
                     test_metrics_regris['RMSE'].append(lasso_rmse)
                     test_metrics_regris['R2'].append(lasso_r2)
             except:
-                st.info('Wait until you are done selecting target data')
+                st.warning('Wait until you are done selecting target data')
         
         if (split_option == 'Train-Test' and model_option == 'Classification') or \
            (split_option == 'Train-Test-Validation' and  model_option == 'Classification'):
@@ -3317,7 +3296,7 @@ if uploaded_file is not None:
                     pass
 
             except:
-                st.info('Wait until you are done selecting target data')
+                st.warning('Wait until you are done selecting target data')
         
         if (split_option == 'Train-Test' and model_option == 'Regression') or \
            (split_option == 'Train-Test-Validation' and  model_option == 'Regression'):
@@ -3334,7 +3313,7 @@ if uploaded_file is not None:
                     st.write(summary.T)
             
             except:
-                st.info('Wait until you are done selecting target data')
+                st.warning('Wait until you are done selecting target data')
         
     def clustering():
         """Function for evaluation metrics for each model selected"""
@@ -3360,7 +3339,7 @@ if uploaded_file is not None:
                     param_dist = {
                         'n_clusters': np.random.randint(2, 10),
                         'init': ['k-means++', 'random'],
-                        'n_init': np.random.randint(10, 31)
+                        'n_init': np.np.random.randint(10, 31)
                     }
 
                     # Initialize KMeans
@@ -3536,7 +3515,7 @@ if uploaded_file is not None:
 
                     # Parameters to search for DBSCAN Clustering
                     param_dist = {
-                        'eps': np.random.uniform(0.01),  
+                        'eps': np.uniform(0.01),  
                         'min_samples': np.random.randint(2, 11),  
                     }
 
@@ -3592,7 +3571,7 @@ if uploaded_file is not None:
                 st.markdown(href, unsafe_allow_html=True)
         
         except:
-            st.info('To obtain a data cluster, you must select the model evaluation first!')
+            st.warning('To obtain a data cluster, you must select the model evaluation first!')
     
     def user():
         """
@@ -3601,7 +3580,7 @@ if uploaded_file is not None:
         # Initialization input data
         global input_data
 
-        # Model option
+        # machine learning option
         if model_option == 'Classification' or model_option == 'Regression':
 
             # Condition original predictors
@@ -3951,7 +3930,7 @@ if uploaded_file is not None:
                 clustering()
 
         except NameError:
-            st.info("Wait until you are done selecting target data")
+            st.warning("Wait until you are done selecting target data")
 
     if __name__ == "__main__":
         main()
