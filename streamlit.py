@@ -5,6 +5,8 @@ from PIL import Image
 from io import BytesIO
 import matplotlib.pyplot as plt
 import base64
+import utils as utl
+import os
 
 # Feature Engineering
 from sklearn.model_selection import train_test_split, RandomizedSearchCV, KFold
@@ -43,19 +45,18 @@ from sklearn.decomposition import PCA
 
 # set pages of dashboard
 st.set_page_config(
-    page_title="UI Machine Learning",
-    page_icon="✅",
+    page_title="Machine Learning Demo",
+    page_icon=" ",
     layout="wide",
 )
+utl.set_page_title('UI Machine Learning')
+utl.local_css("style.css")
+dir_root = os.path.dirname(os.path.abspath(__file__))
+logo = Image.open(dir_root+'/icon.png')
 
-# # Add content to the sidebar
-# # Obtain image from URL
-# url = 'https://drive.google.com/uc?id=1agUzQ6K1LTYAw4JdRKlsuo39fknqS5gx'
-# response = requests.get(url)
-# image = Image.open(BytesIO(response.content))
-
-# # Show image
-# st.sidebar.image(image, use_column_width=True, width=50)
+st.title("Welcome!")
+st.write("We can help with your data to bussiness predict."
+        " Don't forget to read our **Guideline** to learn more. Thanks! 😊.")
 
 # URL file di GitHub
 github_url = 'https://raw.githubusercontent.com/pompymandislian/Interface-Machine-Learning-for-Everyone/main/style.css'
@@ -74,11 +75,34 @@ if response.status_code == 200:
 else:
     print('Failed to retrieve CSS file:', response.status_code)
 
-st.markdown(f'<style>{css}</style>', unsafe_allow_html=True)
+#st.markdown(f'<style>{css}</style>', unsafe_allow_html=True)
 
+# HTML untuk menanamkan tombol dengan CSS
+button_html = """
+    <style>
+        .external-link {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 14px;
+            text-align: center;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            border-radius: 7px;
+            background-color: rgb(239, 247, 249);
+            color: #333;
+        }
+        .external-link:hover {
+            background-color: #fff;
+        }
+    </style>
+    <a class="external-link" href="https://www.google.com/search?sca_esv=682fb458cb082d73&rlz=1C1CHBF_enKR1058ID1058&sxsrf=ACQVn0-tyTd2f481K-TV5nlom58dn6NFZg:1708680383706&q=apel&tbm=isch&source=lnms&sa=X&ved=2ahUKEwjMuri6ksGEAxXI1TgGHZwWDKYQ0pQJegQIDBAB&biw=1422&bih=612&dpr=1.35#imgrc=88-1RY50Ek_bsM" target="_blank">Guideline, Read Here!</a>
+"""
 
-st.sidebar.markdown('**Guideline: [*click here!*](https://www.google.com/search?sca_esv=682fb458cb082d73&rlz=1C1CHBF_enKR1058ID1058&sxsrf=ACQVn0-tyTd2f481K-TV5nlom58dn6NFZg:1708680383706&q=apel&tbm=isch&source=lnms&sa=X&ved=2ahUKEwjMuri6ksGEAxXI1TgGHZwWDKYQ0pQJegQIDBAB&biw=1422&bih=612&dpr=1.35#imgrc=88-1RY50Ek_bsM)**')
-st.sidebar.title('Load Data')
+# Menanamkan tombol HTML ke dalam aplikasi Streamlit
+st.sidebar.markdown(button_html, unsafe_allow_html=True)
+
+st.sidebar.title('Load Your Data Here')
 uploaded_file = st.sidebar.file_uploader("Choose CSV or Excel file", type=['csv', 'xlsx', 'xls'])
 
 # If the file has been uploaded
@@ -134,9 +158,9 @@ if uploaded_file is not None:
     st.sidebar.write('Uploaded Data:')
     st.sidebar.write(df.head())
 
-    st.title('Predict Field')
-    st.write("Hello, welcome to this website. You can use it to predict your data. Enjoy using this website." 
-              "Don't forget to read **Guideline** that provide from us, thankyou 😊.")
+    st.subheader('Predict Field')
+    # st.write("Hello, welcome to this website. You can use it to predict your data. Enjoy using this website." 
+    #           "Don't forget to read **Guideline** that provide from us, thankyou 😊.")
 
     # Choose model
     model_option = st.sidebar.selectbox("Machine learning option:", ("Classification", "Regression", "Clustering"))
