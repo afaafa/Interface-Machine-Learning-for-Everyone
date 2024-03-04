@@ -111,6 +111,6 @@ header > div > div {
     visibility: hidden;
 }
 
-div#root .styles_streamlitAppContainer__w82h8 > div > button {
+div#root > div > div > div > button {
     visibility: hidden;
 }
