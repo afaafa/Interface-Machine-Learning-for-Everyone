@@ -111,6 +111,6 @@ header > div > div {
     visibility: hidden;
 }
 
-div :id > div > div > div > button {
+.styles_stateContainer__CelYF > button {
     visibility: hidden;
 }
