@@ -111,6 +111,7 @@ header > div > div {
     visibility: hidden;
 }
 
-div#root > div > div > div > button {
+button .styles_terminalButton__JBj5T {
     visibility: hidden;
 }
+
