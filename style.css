@@ -97,11 +97,12 @@ section:first-child {
     color: rgb(239, 247, 249);
 }
 
-.stSidebar > .element-container > label > div > p {
+section > div > div > div > div > div > div > div > div > label > div > p {
     color: rgb(239, 247, 249);
     font-size: 12px;
 }
 
-.element-container > div > label > div > p {
+label > div > p {
     color: #333;
+    font-size: 12px;
 }
