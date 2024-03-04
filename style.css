@@ -106,3 +106,7 @@ label > div > p {
     color: #333;
     font-size: 12px;
 }
+
+header > div > div {
+    visibility: none;
+}
