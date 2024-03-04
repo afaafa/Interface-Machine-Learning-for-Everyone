@@ -108,5 +108,5 @@ label > div > p {
 }
 
 header > div > div {
-    visibility: none;
+    visibility: hidden;
 }
